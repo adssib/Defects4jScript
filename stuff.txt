@@ -1,0 +1,15 @@
+To run randoop to generate tests
+gen_tests.pl -g randoop -p Lang -v 1b -n 1 -o /Randoop -b 500
+
+Time, Math, CSV, GSON,codec
+-v 60b the project with the bug present
+-v 60f means the bug have been fixed 
+Running normal tests without anything else on Lang -v1b 
+
+ defects4j checkout -p Lang -v 1b -w .
+Defects4j coverage 
+gen_tests.pl -g randoop -p Lang -v 1b -n 101 -o RandTests -b 50 -D
+Mutation test will fail if not using the fixed bug !! 
+4 commands to use: coverage, checkout, gen_tests, mutation 
+ sudo apt-get install bzip2
+defects4j coverage -s RandTests/Lang/randoop/101/Lang-1b-randoop.101.tar.bz2
