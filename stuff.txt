@@ -13,3 +13,5 @@ Mutation test will fail if not using the fixed bug !!
 4 commands to use: coverage, checkout, gen_tests, mutation 
  sudo apt-get install bzip2
 defects4j coverage -s RandTests/Lang/randoop/101/Lang-1b-randoop.101.tar.bz2
+
+chmod +x script.sh
