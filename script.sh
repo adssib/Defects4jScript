@@ -12,14 +12,33 @@ CYAN='\033[1;36m'
 WHITE='\033[1;37m'
 NC='\033[0m' # No color
 
-# Ensure bzip2 is installed
-echo -e "${YELLOW}INFO:${NC} checking is wanted packages are installed"
+# Function to log messages with different levels
+log() {
+    local level=$1
+    local message=$2
+    case $level in
+        SUCCESS) echo -e "${GREEN}[SUCCESS]${NC} $message" ;;
+        INFO) echo -e "${WHITE}[INFO]${NC} $message" ;;
+        WARNING) echo -e "${YELLOW}[WARNING]${NC} $message" ;;
+        ERROR) echo -e "${RED}[ERROR]${NC} $message" ;;
+        LOADING) echo -e "${BLUE}[LOADING]${NC} $message" ;;
+        DEBUG) echo -e "${CYAN}[DEBUG]${NC} $message" ;;
+        *) echo -e "${WHITE}[UNKNOWN]${NC} $message" ;;  # Fallback
+    esac
+}
 
-if ! command -v bzip2 &> /dev/null; then
-    echo ""
-    echo -e "${RED}Warning:${NC} 'bzip2' is not installed!"
-    sudo apt-get install -y bzip2
-else 
-    echo ""
-    echo -e "${GREEN}INFO:${NC} 'bzip2' is intalled"
-fi
+check_package() {
+    local package=$1
+    if ! command -v "$package" &> /dev/null; then
+        log WARNING "'$package' is not installed!"
+        log LOADING "Installing '$package'..."
+        sudo apt-get install -y "$package"
+        log SUCCESS "'$package' installed successfully!"
+    else
+        log SUCCESS "'$package' is already installed"
+    fi
+}
+
+# Check for required packages
+log INFO "Checking required packages..."
+check_package bzip2
