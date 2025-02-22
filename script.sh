@@ -10,9 +10,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 CYAN='\033[1;36m'
 WHITE='\033[1;37m'
-NC='\033[0m' # No color
+NC='\033[0m'
 
-# Function to log messages with different levels
 log() {
     local level=$1
     local message=$2
@@ -23,7 +22,7 @@ log() {
         ERROR) echo -e "${RED}[ERROR]${NC} $message" ;;
         LOADING) echo -e "${BLUE}[LOADING]${NC} $message" ;;
         DEBUG) echo -e "${CYAN}[DEBUG]${NC} $message" ;;
-        *) echo -e "${WHITE}[UNKNOWN]${NC} $message" ;;  # Fallback
+        *) echo -e "${WHITE}[UNKNOWN]${NC} $message" ;;  
     esac
 }
 
@@ -39,6 +38,5 @@ check_package() {
     fi
 }
 
-# Check for required packages
 log INFO "Checking required packages..."
 check_package bzip2
