@@ -15,3 +15,13 @@ Mutation test will fail if not using the fixed bug !!
 defects4j coverage -s RandTests/Lang/randoop/101/Lang-1b-randoop.101.tar.bz2
 
 chmod +x script.sh
+
+List of commands used and there sutff abiut 
+checkout : -p -v -w 
+coverage : nothing for normal, -s for a test generated suite  
+mutation : here we have to check if the version number is fixed or not 
+gen_tests : -g -n -o -b 
+
+-o we can specify with it 
+
+the output test path is also coded so we know where to find it 
