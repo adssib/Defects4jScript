@@ -1,8 +1,22 @@
 #!/bin/bash
 
+# if we are adding a '-x' if will print some intresting results 
+
 # Exit script on error
 set -e
 
+if [ "@?" -ne 0] ; then 
+    log ERROR "no parameters were supplied"
+    help()
+fi 
+
+for arg in "$@";
+do
+    case "$arg" in
+        -h) help()
+
+    esac
+done 
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -12,6 +26,10 @@ CYAN='\033[1;36m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
+help() {
+    log INFO "idk how to use my script either" 
+    exit 1
+}
 log() {
     local level=$1
     local message=$2
