@@ -33,8 +33,13 @@ fi
 targetDefects4j="/home/adssib/345/defects4j"  # Fixed path
 checkPackage() {
     local package=$1
+    local fix=$2
+
     if ! command -v "$package" &> /dev/null; then
         log WARNING "'$package' is not installed!"
+        if [ "$fix" == "true" ]; then
+            fixPackages "$package"
+        fi
     else
         log SUCCESS "'$package' is already installed"
     fi
@@ -42,29 +47,38 @@ checkPackage() {
 
 
 doctor() {
+    local fixPackages=$1
     log INFO "Checking required packages..."
-    checkPackage bzip2
-    checkPackage defects4j
+    if [ "$fixPackages" == "true" ]; then
+       checkPackage bzip2 true
+       checkPackage defects4j true
+    else 
+        checkPackage defects4j
+        checkPackage bzip2 
+    fi
 }
 
 fixPackages() {
     local package=$1
     if [[ "$package" == "defects4j" ]]; then
-        log WARNING "defects4j is not installed" 
+        log INFO "Fixing defects4j" 
         cd "$targetDefects4j" || { log ERROR "Failed to change directory to $targetDefects4j"; exit 1; }
         log INFO "going inside of '$PWD'"
         log LOADING "initialting the script" 
         ./init.sh
+        export PATH=$PATH:"$targetDefects4j"/framework/bin
+        checkPackage defects4j
     else
         log LOADING "Installing '$package'..."
         sudo apt-get install -y "$package"
         log SUCCESS "'$package' installed successfully!"
-        log SUCCESS "'$package' is already installed"
     fi
 }
 
 comandHelp() {
-    log INFO "idk how to use my script either" 
+    log INFO "Usage of the script:"
+    echo " -d or --doctor: Check for required packages"
+    echo " -d --fix: Fix and install packages if necessary"
     exit 1
 }
 
@@ -74,13 +88,24 @@ if [ "$#" -eq 0 ]; then
     comandHelp
 fi
 
-for arg in "$@";
-do
+fix=false
+doctor_flag=false
+
+# Loop through all arguments
+for arg in "$@"; do
     case "$arg" in
-        -h) help ;;
-        --doctor) doctor ;;
-        -d) doctor ;;
-        # -d --fix) 
-        *) help ;;
+        -h) comandHelp ;;         
+        --doctor | -d) doctor_flag=true ;; 
+        --fix-packages) fix=true ;;       
+        *) comandHelp ;; 
     esac
-done 
+done
+
+# Check if we need to call the doctor function
+if [ "$doctor_flag" == true ]; then
+    if [ "$fix" == true ]; then
+        doctor true   # If both doctor and --fix are provided, fix packages
+    else
+        doctor false  # Just check packages without fixing
+    fi
+fi
