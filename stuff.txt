@@ -1,3 +1,8 @@
+How to use it: 
+
+    sudo ./runner.sh -p Lang -v 1f -b 50 -d /home/adssib/345/defects4j
+
+
 To run randoop to generate tests
 gen_tests.pl -g randoop -p Lang -v 1b -n 1 -o /Randoop -b 500
 
