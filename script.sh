@@ -3,6 +3,8 @@
 # Exit script on error
 set -e
 
+# the script is almost done I just need to add the fucking commands to run it correclty and stuff 
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -37,8 +39,20 @@ checkPackage() {
 
     if ! command -v "$package" &> /dev/null; then
         log WARNING "'$package' is not installed!"
-        if [ "$fix" == "true" ]; then
-            fixPackages "$package"
+        if [ "$package" == "defects4j" ]; then
+            # Check if defects4j is installed by running `defects4j help`
+            if ! defects4j help &> /dev/null; then
+                log WARNING "'defects4j' is not installed or not accessible!"
+                if [ "$fix" == "true" ]; then
+                    fixPackages "$package"
+                fi
+            else
+                log SUCCESS "'defects4j' is installed and accessible."
+            fi
+        else
+            if [ "$fix" == "true" ]; then
+                fixPackages "$package"
+            fi
         fi
     else
         log SUCCESS "'$package' is already installed"
@@ -66,7 +80,7 @@ fixPackages() {
         log INFO "going inside of '$PWD'"
         log LOADING "initialting the script" 
         ./init.sh
-        export PATH=$PATH:"$targetDefects4j"/framework/bin
+        export PATH=$PATH:$targetDefects4j/framework/bin
         checkPackage defects4j
     else
         log LOADING "Installing '$package'..."
@@ -75,10 +89,20 @@ fixPackages() {
     fi
 }
 
-comandHelp() {
+# checkout : -p -v -w 
+# coverage : nothing for normal, -s for a test generated suite  
+# mutation : here we have to check if the version number is fixed or not 
+# gen_tests : -g -n -o -b 
+PROJECT_NAME=""
+VERSION=""
+WORKING_DIR=""
+B_VALUE=""
+
+commandHelp() {
     log INFO "Usage of the script:"
-    echo " -d or --doctor: Check for required packages"
-    echo " -d --fix: Fix and install packages if necessary"
+    echo " -d, --doctor      : Check for required packages"
+    echo " --fix-packages    : Attempt to fix missing packages"
+    echo " -h                : Show this help menu"
     exit 1
 }
 
@@ -92,14 +116,23 @@ fix=false
 doctor_flag=false
 
 # Loop through all arguments
-for arg in "$@"; do
-    case "$arg" in
-        -h) comandHelp ;;         
-        --doctor | -d) doctor_flag=true ;; 
-        --fix-packages) fix=true ;;       
-        *) comandHelp ;; 
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -p) PROJECT_NAME="$2"; shift 2 ;;  # Shift past argument and value
+        -v) VERSION="$2"; shift 2 ;;
+        -w) WORKING_DIR="$2"; shift 2 ;;
+        -b) B_VALUE="$2"; shift 2 ;;
+        -d|--doctor) doctor_flag=true; shift ;;
+        --fix-packages) fix=true; shift ;;
+        -h) commandHelp ;;
+        *) log ERROR "Unknown argument: $1"; commandHelp ;;
     esac
 done
+
+# if [[ -z "$PROJECT_NAME" || -z "$VERSION" || -z "$WORKING_DIR" || -z "$B_VALUE" ]]; then
+#     log ERROR "Missing required parameters!"
+#     commandHelp
+# fi
 
 # Check if we need to call the doctor function
 if [ "$doctor_flag" == true ]; then
@@ -109,3 +142,8 @@ if [ "$doctor_flag" == true ]; then
         doctor false  # Just check packages without fixing
     fi
 fi
+
+# log INFO "Project Name: $PROJECT_NAME"
+# log INFO "Version: $VERSION"
+# log INFO "Working Directory: $WORKING_DIR"
+# log INFO "B Value: $B_VALUE"
